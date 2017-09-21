@@ -2,7 +2,7 @@
 CLI app to send emails (including attachments) using GMail with OAuth.
 
 ## Requirements
-Python 3.6+
+Python 3.6+  
 pip install -r requirements.txt
 
 ## Before Use
