@@ -17,17 +17,9 @@ from google_auth import GoogleAuth
 
 
 def create_message_with_attachment(to, subject, message_text, attachment):
-    """Create a message for an email.
-        Maximum file size: 35MB
+    """Returns a RFC2387 formatted email message as base64url encoded byte string.
 
-    Args:
-        to: Email address of the receiver.
-        subject: The subject of the email message.
-        message_text: The text of the email message.
-        attachment: The path to the file to be attached.
-
-    Returns:
-        The entire email message in an RFC2387 formatted and base64url encoded byte string.
+    Maximum file size:Returns an  35MB
     """
 
     # The body of the request is formatted as a multipart/related content type [RFC2387]
@@ -62,17 +54,7 @@ def create_message_with_attachment(to, subject, message_text, attachment):
 
 
 def create_message(to, subject, message_text):
-    """Create a message for an email.
-
-    Args:
-        to: recipient's email address
-        subject: The subject of the email message.
-        message_text: The text of the email message.
-
-    Returns:
-        An object containing a base64url encoded email object.
-        A RFC2822 formatted email as a base64url encoded string.
-    """
+    """Returns a RFC2822 formatted email message as a base64url encoded  """
     message = MIMEText(message_text)
     message['to'] = to
     message['subject'] = subject
