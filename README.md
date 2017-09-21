@@ -2,12 +2,12 @@
 CLI app to send emails (including attachments) using GMail with OAuth.
 
 ## Before Use
-Use the [Google API Console](https://console.developers.google.com/apis/api) to create an OAuth credential for the GMail you want to send from.
+Use the [Google API Console](https://console.developers.google.com/apis/api) to create OAuth credentials for the GMail you want to send from.
 
- 1. Click ｀My Project`
- 2.
- 3.
-
+ 1. Click ｀My Project` and create a new project. After completion it will take you back to the main page.
+ 2. Click `Credentials` in the left pane and choose `OAuth client ID` from the `Create credentials` drop-down menu.
+ 3. Choose `Other` as the application type.
+ 4. Save the client ID and secret.
 
 ## Usage
 ### Command line
