@@ -1,5 +1,13 @@
 # gmailer_oauth
-CLI app to send emails (including attachments) using Gmail with OAuth
+CLI app to send emails (including attachments) using GMail with OAuth.
+
+## Before Use
+Use the [Google API Console](https://console.developers.google.com/apis/api) to create an OAuth credential for the GMail you want to send from.
+
+ 1. Click ｀My Project`
+ 2.
+ 3.
+
 
 ## Usage
 ### Command line
