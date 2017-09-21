@@ -82,10 +82,13 @@ def create_message(to, subject, message_text):
 
 @click.command()
 @click.argument('recipient')
-@click.argument('message')
+@click.option('--message', '-m',
+              default='',
+              help='Message to send in email body.',
+              )
 @click.option('--subject', '-s',
               default='',
-              help='Subject of the email to send',
+              help='Subject of the email to send.',
               )
 @click.option('--attachment', '-a',
               type=click.Path(exists=True),
