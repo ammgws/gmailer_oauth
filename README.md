@@ -1,6 +1,10 @@
 # gmailer_oauth
 CLI app to send emails (including attachments) using GMail with OAuth.
 
+## Requirements
+Python 3.6+  
+pip install -r requirements.txt
+
 ## Before Use
 Use the [Google API Console](https://console.developers.google.com/apis/api) to create OAuth credentials for the GMail you want to send from.
 
