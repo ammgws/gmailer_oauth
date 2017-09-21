@@ -22,10 +22,6 @@ def create_message_with_attachment(to, subject, message_text, attachment):
     Maximum file size:Returns an  35MB
     """
 
-    # The body of the request is formatted as a multipart/related content type [RFC2387]
-    # and contains exactly two parts. The parts are identified by a boundary string, and
-    # the final boundary string is followed by two hyphens.
-
     message = MIMEMultipart('related')
     message['to'] = to
     message['subject'] = subject
