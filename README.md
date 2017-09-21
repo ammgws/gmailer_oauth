@@ -4,12 +4,12 @@ CLI app to send emails (including attachments) using Gmail with OAuth
 ## Usage
 ### Command line
 
->Usage: gmailer_oauth.py [OPTIONS] RECIPIENT MESSAGE
+>Usage: gmailer_oauth.py [OPTIONS] RECIPIENT
 >
 >  todo.
 >
 >Options:
->  -s, --subject TEXT      Subject of the email to send
+>  -s, --subject TEXT      Subject of the email to send.
 >  -a, --attachment PATH   Path to attachment.
 >  -c, --config_path PATH  Path to directory containing config file.
 >  --dry-run
