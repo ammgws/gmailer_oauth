@@ -98,7 +98,6 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
 
     # TODO: import from Google provided json file？
     # TODO: config from env vars
-    # TODO: use XDG_CONFIG instead of hardcoded
     cache_dir = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME)
     if not os.path.isdir(cache_dir):
         os.makedirs(cache_dir, exist_ok=True)
