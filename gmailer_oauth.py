@@ -50,7 +50,7 @@ def create_message_with_attachment(to, subject, message_text, attachment):
 
 
 def create_message(to, subject, message_text):
-    """Returns a RFC2822 formatted email message as a base64url encoded string. """
+    """Returns a RFC2822 formatted email message as a base64url encoded string."""
     message = MIMEText(message_text)
     message['to'] = to
     message['subject'] = subject
