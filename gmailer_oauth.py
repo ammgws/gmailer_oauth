@@ -134,7 +134,7 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
                 message_text=message,
                 attachment=attachment,
         )
-        resp = requests.post(request_url, headers=headers, data=message_body)
+        req = requests.Request('POST', request_url, headers=headers, data=message_body)
     else:
         request_url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send'
         headers = {'Authorization': f'Bearer {oauth.access_token}'}
@@ -143,20 +143,22 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
                 subject=subject,
                 message_text=message,
         )
-        resp = requests.post(request_url, headers=headers, json=message_body)
+        req = requests.Request('POST', request_url, headers=headers, json=message_body)
 
+    req = req.prepare()
     if dry_run:
-        req = requests.Request('POST', request_url, headers=headers, data=message_body).prepare()
         print(req.headers)
         print(req.body)
     else:
-        logging.debug(resp.status_code)
-        logging.debug(resp.content)
+        s = requests.Session()
+        r = s.send(req)
+        logging.debug(r.status_code)
+        logging.debug(r.content)
 
-        if resp.status_code == 200:
+        if r.status_code == 200:
             logging.info('Successfully sent mail from %s.', oauth.get_email())
         else:
-            logging.error('Something went wrong. Response from Google: %s', resp.content)
+            logging.error('Something went wrong. Response from Google: %s', r.content)
 
 
 def configure_logging(config_path):
