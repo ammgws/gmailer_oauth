@@ -4,6 +4,7 @@ import datetime as dt
 import logging
 import mimetypes
 import os.path
+from configparser import ConfigParser
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
@@ -14,6 +15,8 @@ import click
 import requests
 # Custom imports
 from google_auth import GoogleAuth
+
+APP_NAME = 'gmail-oauth'
 
 
 def create_message_with_attachment(to, subject, message_text, attachment):
@@ -72,31 +75,48 @@ def create_message(to, subject, message_text):
               type=click.Path(exists=True),
               help='Path to attachment.',
               )
+@click.option('--client-id', '-i',
+              type=click.STRING,
+              help='Google OAUTH client ID.',
+              )
+@click.option('--client-secret', '-k',
+              type=click.STRING,
+              help='Google OAUTH client ID.',
+              )
 @click.option('--config_path', '-c',
-              default=os.path.expanduser('~/.config/gmail-oauth'),
+              default=os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')), APP_NAME),
               type=click.Path(exists=True),
               help='Path to directory containing config file.',
               )
 @click.option('--dry-run', is_flag=True)
-def main(config_path, recipient, message, subject, attachment, dry_run):
-    """
-    todo.
+def main(config_path, recipient, message, subject, attachment, dry_run, client_id, client_secret):
+    """TODO.
     """
 
     # TODO: make logging optional
     configure_logging(config_path)
 
-    # TODO: import from Google provided json file
+    # TODO: import from Google provided json file？
     # TODO: config from env vars
     # TODO: use XDG_CONFIG instead of hardcoded
-    # Path to config file
+    cache_dir = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME)
+    if not os.path.isdir(cache_dir):
+        os.makedirs(cache_dir, exist_ok=True)
+
     config_file = os.path.join(config_path, 'config.ini')
     logging.debug('Using config file: %s', config_file)
+    config = ConfigParser()
+    config.read(config_file)
+    client_id = config.get('Gmail', 'client_id')
+    client_secret = config.get('Gmail', 'client_secret')
+    refresh_token_file = os.path.join(cache_dir, 'refresh_token')
 
     # Setup Google OAUTH instance for accessing Gmail
-    oauth2_scope = ('https://www.googleapis.com/auth/gmail.send '
-                    'https://www.googleapis.com/auth/userinfo.email')
-    oauth = GoogleAuth(config_file, oauth2_scope, service='Gmail')
+    scopes = [
+        'https://www.googleapis.com/auth/gmail.send',
+        'https://www.googleapis.com/auth/userinfo.email',
+    ]
+    oauth = GoogleAuth(client_id, client_secret, scopes, refresh_token_file)
     oauth.authenticate()
 
     # Create and send email
