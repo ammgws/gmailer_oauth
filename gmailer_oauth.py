@@ -10,10 +10,9 @@ from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-# Third party imports
+# Third party
 import click
 import requests
-# Custom imports
 from google_auth import GoogleAuth
 
 APP_NAME = 'gmail-oauth'
@@ -63,32 +62,38 @@ def create_message(to, subject, message_text):
 
 @click.command()
 @click.argument('recipient')
-@click.option('--message', '-m',
-              default='',
-              help='Message to send in email body.',
-              )
-@click.option('--subject', '-s',
-              default='',
-              help='Subject of the email to send.',
-              )
-@click.option('--attachment', '-a',
-              type=click.Path(exists=True),
-              help='Path to attachment.',
-              )
-@click.option('--client-id', '-i',
-              type=click.STRING,
-              help='Google OAUTH client ID.',
-              )
-@click.option('--client-secret', '-k',
-              type=click.STRING,
-              help='Google OAUTH client ID.',
-              )
 @click.option('--config_path', '-c',
               default=os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')), APP_NAME),
               type=click.Path(exists=True),
               help='Path to directory containing config file.',
               )
+@click.option(
+    '--message', '-m',
+    default='',
+    help='Message to send in email body.',
+)
+@click.option(
+    '--subject', '-s',
+    default='',
+    help='Subject of the email to send.',
+)
+@click.option(
+    '--attachment', '-a',
+    type=click.Path(exists=True),
+    help='Path to attachment.',
+)
+@click.option(
+    '--client-id', '-i',
+    type=click.STRING,
+    help='Google OAUTH client ID.',
+)
+@click.option(
+    '--client-secret', '-k',
+    type=click.STRING,
+    help='Google OAUTH client ID.',
+)
 @click.option('--dry-run', is_flag=True)
+@click.option('--interactive', '-i', is_flag=True)
 def main(config_path, recipient, message, subject, attachment, dry_run, client_id, client_secret):
     """TODO.
     """
@@ -118,11 +123,13 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
     oauth = GoogleAuth(client_id, client_secret, scopes, refresh_token_file)
     oauth.authenticate()
 
+    # TODO: authentication failure error handling
+
     # Create and send email
     # see https://developers.google.com/gmail/api/guides/uploads
     #     https://developers.google.com/gmail/api/v1/reference/users/messages/send
     if attachment:
-        request_url = 'https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=multipart'
+        url = 'https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=multipart'
         headers = {
             'Authorization': f'Bearer {oauth.access_token}',
             'Content-Type': 'message/rfc822'
@@ -133,16 +140,16 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
                 message_text=message,
                 attachment=attachment,
         )
-        req = requests.Request('POST', request_url, headers=headers, data=message_body)
+        req = requests.Request('POST', url, headers=headers, data=message_body)
     else:
-        request_url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send'
+        url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send'
         headers = {'Authorization': f'Bearer {oauth.access_token}'}
         message_body = create_message(
                 to=recipient,
                 subject=subject,
                 message_text=message,
         )
-        req = requests.Request('POST', request_url, headers=headers, json=message_body)
+        req = requests.Request('POST', url, headers=headers, json=message_body)
 
     req = req.prepare()
     if dry_run:
@@ -157,7 +164,7 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
         if r.status_code == 200:
             logging.info('Successfully sent mail from %s.', oauth.get_email())
         else:
-            logging.error('Something went wrong. Response from Google: %s', r.content)
+            logging.error('Something went wrong. Response from Google: %s.', r.content)
 
 
 def configure_logging(config_path):
@@ -174,8 +181,9 @@ def configure_logging(config_path):
     log_handler = logging.FileHandler(log_filepath)
 
     log_format = logging.Formatter(
-            fmt='%(asctime)s.%(msecs).03d %(name)-12s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)',
-            datefmt='%Y-%m-%d %H:%M:%S')
+        fmt='%(asctime)s.%(msecs).03d %(name)-12s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
     log_handler.setFormatter(log_format)
     logger.addHandler(log_handler)
     # Lower requests module's log level so that OAUTH2 details aren't logged
