@@ -62,11 +62,6 @@ def create_message(to, subject, message_text):
 
 @click.command()
 @click.argument('recipient')
-@click.option('--config_path', '-c',
-              default=os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')), APP_NAME),
-              type=click.Path(exists=True),
-              help='Path to directory containing config file.',
-              )
 @click.option(
     '--message', '-m',
     default='',
@@ -91,6 +86,18 @@ def create_message(to, subject, message_text):
     '--client-secret', '-k',
     type=click.STRING,
     help='Google OAUTH client ID.',
+)
+@click.option(
+    '--config-path',
+    default=os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')), APP_NAME),
+    type=click.Path(exists=True),
+    help='Path to directory containing config file.',
+)
+@click.option(
+    '--cache-path',
+    type=click.Path(exists=True),
+    default=os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME),
+    help='Path to directory to store logs and such.',
 )
 @click.option('--dry-run', is_flag=True)
 @click.option('--interactive', '-i', is_flag=True)
@@ -167,14 +174,14 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
             logging.error('Something went wrong. Response from Google: %s.', r.content)
 
 
-def configure_logging(config_path):
+def configure_logging(log_dir):
     # Configure root logger. Level 5 = verbose to catch mostly everything.
     logger = logging.getLogger()
     logger.setLevel(level=5)
 
-    log_folder = os.path.join(config_path, 'logs')
+    log_folder = os.path.join(log_dir, 'logs')
     if not os.path.exists(log_folder):
-        os.makedirs(log_folder, exist_ok=True)
+        os.makedirs(log_folder)
 
     log_filename = '{0}.log'.format(dt.datetime.now().strftime('%Y%m%d_%Hh%Mm%Ss'))
     log_filepath = os.path.join(log_folder, log_filename)
