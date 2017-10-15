@@ -1,3 +1,4 @@
 click
 requests
+git+git://github.com/ammgws/google_auth.git
 
