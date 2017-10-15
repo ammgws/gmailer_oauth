@@ -1,5 +1,8 @@
 # gmailer_oauth
-CLI app to send emails (including attachments) using GMail with OAuth.
+CLI app to send emails using GMail with OAuth.
+
+## Why?
+Security - your Gmail password is never used or saved on the system.
 
 ## Requirements
 Python 3.6+  
@@ -15,17 +18,23 @@ Use the [Google API Console](https://console.developers.google.com/apis/api) to 
 
 ## Usage
 ### Command line
+```
+Usage: gmailer_oauth.py [OPTIONS] RECIPIENT
 
->Usage: gmailer_oauth.py [OPTIONS] RECIPIENT
->
->  todo.
->
->Options:
->  -s, --subject TEXT      Subject of the email to send.
->  -a, --attachment PATH   Path to attachment.
->  -c, --config_path PATH  Path to directory containing config file.
->  --dry-run
->  --help                  Show this message and exit.
+  TODO.
+
+Options:
+  -m, --message TEXT        Message to send in email body.
+  -s, --subject TEXT        Subject of the email to send.
+  -a, --attachment PATH     Path to attachment.
+  -i, --client-id TEXT      Google OAUTH client ID.
+  -k, --client-secret TEXT  Google OAUTH client secret.
+  --config-path PATH        Path to directory containing config file.
+  --cache-path PATH         Path to directory to store logs and such.
+  --dry-run
+  -i, --interactive
+  --help                    Show this message and exit.
+```
 
 ### As a module
 TO DO
