@@ -1,4 +1,3 @@
-# Standard library
 import base64
 import datetime as dt
 import logging
@@ -10,6 +9,7 @@ from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from pathlib import Path
 # Third party
 import click
 import requests
@@ -85,7 +85,7 @@ def create_message(to, subject, message_text):
 @click.option(
     '--client-secret', '-k',
     type=click.STRING,
-    help='Google OAUTH client ID.',
+    help='Google OAUTH client secret.',
 )
 @click.option(
     '--config-path',
@@ -101,14 +101,13 @@ def create_message(to, subject, message_text):
 )
 @click.option('--dry-run', is_flag=True)
 @click.option('--interactive', '-i', is_flag=True)
-def main(config_path, recipient, message, subject, attachment, dry_run, client_id, client_secret):
+def main(config_path, cache_path, recipient, message, subject, attachment, dry_run, client_id, client_secret):
     """TODO.
     """
 
     # TODO: make logging optional
     configure_logging(config_path)
 
-    # TODO: import from Google provided json file？
     # TODO: config from env vars
     cache_dir = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME)
     if not os.path.isdir(cache_dir):
@@ -120,14 +119,16 @@ def main(config_path, recipient, message, subject, attachment, dry_run, client_i
     config.read(config_file)
     client_id = config.get('Gmail', 'client_id')
     client_secret = config.get('Gmail', 'client_secret')
-    refresh_token_file = os.path.join(cache_dir, 'refresh_token')
+    token_file = os.path.join(cache_path, 'hangouts_cached_token')
+    if not os.path.isfile(token_file):
+        Path(token_file).touch()
 
     # Setup Google OAUTH instance for accessing Gmail
     scopes = [
         'https://www.googleapis.com/auth/gmail.send',
         'https://www.googleapis.com/auth/userinfo.email',
     ]
-    oauth = GoogleAuth(client_id, client_secret, scopes, refresh_token_file)
+    oauth = GoogleAuth(client_id, client_secret, scopes, token_file)
     oauth.authenticate()
 
     # TODO: authentication failure error handling
