@@ -25,7 +25,7 @@ def prepare_message(to, subject, message_text, attachment):
         return create_message(to, subject, message_text)
 
 
-def create_message_with_attachment(to, subject, message_text, attachment):
+def create_message_with_attachment(to, subject, message_text, attachment, cc=None, bcc=None):
     """Returns a RFC2387 formatted email message as base64url encoded byte string.
 
     Maximum file size: 35MB.
@@ -34,6 +34,10 @@ def create_message_with_attachment(to, subject, message_text, attachment):
     message = MIMEMultipart('related')
     message['to'] = to
     message['subject'] = subject
+    if cc:
+        message['cc'] = cc
+    if bcc:
+        message['bcc'] = bcc
     message.attach(MIMEText(message_text, _subtype='plain', _charset='UTF-8'))
 
     content_type, encoding = mimetypes.guess_type(attachment)
@@ -58,11 +62,16 @@ def create_message_with_attachment(to, subject, message_text, attachment):
     return message.as_bytes()
 
 
-def create_message(to, subject, message_text):
+def create_message(to, subject, message_text, cc=None, bcc=None):
     """Returns a RFC2822 formatted email message as a base64url encoded string."""
     message = MIMEText(message_text)
     message['to'] = to
     message['subject'] = subject
+    if cc:
+        message['cc'] = cc
+    if bcc:
+        message['bcc'] = bcc
+
 
     return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
 
@@ -91,6 +100,16 @@ def create_dir(ctx, param, directory):
     help='Path to attachment.',
 )
 @click.option(
+    '--cc', '-c',
+    type=click.STRING,
+    help='Carbon copy recipient.',
+)
+@click.option(
+    '--bcc', '-b',
+    type=click.STRING,
+    help='Blind carbon copy recipient.',
+)
+@click.option(
     '--client-id',
     type=click.STRING,
     help='Google OAUTH client ID.',
@@ -116,7 +135,7 @@ def create_dir(ctx, param, directory):
 )
 @click.option('--dry-run', is_flag=True)
 @click.option('--interactive', '-i', is_flag=True)
-def main(config_path, cache_path, recipient, message, subject, dry_run, client_id, client_secret, attachment=None):
+def main(config_path, cache_path, recipient, message, subject, dry_run, client_id, client_secret, cc=None, bcc=None, attachment=None):
     """TODO.
     """
 
