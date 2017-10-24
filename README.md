@@ -27,8 +27,10 @@ Options:
   -m, --message TEXT        Message to send in email body.
   -s, --subject TEXT        Subject of the email to send.
   -a, --attachment PATH     Path to attachment.
-  -i, --client-id TEXT      Google OAUTH client ID.
-  -k, --client-secret TEXT  Google OAUTH client secret.
+  -c, --cc TEXT             Carbon copy recipient.
+  -b, --bcc TEXT            Blind carbon copy recipient.
+  --client-id TEXT          Google OAUTH client ID.
+  --client-secret TEXT      Google OAUTH client secret.
   --config-path PATH        Path to directory containing config file.
   --cache-path PATH         Path to directory to store logs and such.
   --dry-run
