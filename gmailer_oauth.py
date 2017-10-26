@@ -18,14 +18,14 @@ from google_auth import GoogleAuth
 APP_NAME = 'gmailer-oauth'
 
 
-def prepare_message(to, subject, message_text, attachment):
+def prepare_message(to, subject, message_text, attachment,cc=None,bcc=None):
     if attachment:
-        return create_message_with_attachment(to, subject, message_text, attachment)
+        return create_message_with_attachment(to, subject, message_text, attachment, cc, bcc)
     else:
-        return create_message(to, subject, message_text)
+        return create_message(to, subject, message_text, cc, bcc)
 
 
-def create_message_with_attachment(to, subject, message_text, attachment, cc=None, bcc=None):
+def create_message_with_attachment(to, subject, message_text, attachment, cc, bcc):
     """Returns a RFC2387 formatted email message as base64url encoded byte string.
 
     Maximum file size: 35MB.
@@ -62,7 +62,7 @@ def create_message_with_attachment(to, subject, message_text, attachment, cc=Non
     return message.as_bytes()
 
 
-def create_message(to, subject, message_text, cc=None, bcc=None):
+def create_message(to, subject, message_text, cc, bcc):
     """Returns a RFC2822 formatted email message as a base64url encoded string."""
     message = MIMEText(message_text)
     message['to'] = to
@@ -176,6 +176,8 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, interact
             subject=subject,
             message_text=message,
             attachment=attachment,
+            cc=cc,
+            bcc=bcc
     )
     if attachment:
         url = 'https://www.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=multipart'
