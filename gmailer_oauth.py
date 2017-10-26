@@ -18,7 +18,7 @@ from google_auth import GoogleAuth
 APP_NAME = 'gmailer-oauth'
 
 
-def prepare_message(to, subject, message_text, attachment,cc=None,bcc=None):
+def prepare_message(to, subject, message_text, attachment, cc=None, bcc=None):
     if attachment:
         return create_message_with_attachment(to, subject, message_text, attachment, cc, bcc)
     else:
@@ -34,10 +34,8 @@ def create_message_with_attachment(to, subject, message_text, attachment, cc, bc
     message = MIMEMultipart('related')
     message['to'] = to
     message['subject'] = subject
-    if cc:
-        message['cc'] = cc
-    if bcc:
-        message['bcc'] = bcc
+    message['cc'] = cc
+    message['bcc'] = bcc
     message.attach(MIMEText(message_text, _subtype='plain', _charset='UTF-8'))
 
     content_type, encoding = mimetypes.guess_type(attachment)
@@ -67,10 +65,8 @@ def create_message(to, subject, message_text, cc, bcc):
     message = MIMEText(message_text)
     message['to'] = to
     message['subject'] = subject
-    if cc:
-        message['cc'] = cc
-    if bcc:
-        message['bcc'] = bcc
+    message['cc'] = cc
+    message['bcc'] = bcc
 
 
     return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
