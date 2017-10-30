@@ -130,7 +130,7 @@ def create_dir(ctx, param, directory):
     help='Path to directory to store logs and such. Defaults to XDG cache dir.',
 )
 @click.option('--dry-run', is_flag=True)
-@click.option('--interactive', '-i', is_flag=True)
+# @click.option('--interactive', '-i', is_flag=True)
 def main(config_path, cache_path, recipient, message, subject, dry_run, client_id, client_secret, cc=None, bcc=None, attachment=None):
     """TODO.
     """
@@ -144,11 +144,15 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, client_i
         os.makedirs(cache_dir, exist_ok=True)
 
     config_file = os.path.join(config_path, 'config.ini')
-    logging.debug('Using config file: %s', config_file)
-    config = ConfigParser()
-    config.read(config_file)
-    client_id = config.get('Gmail', 'client_id')
-    client_secret = config.get('Gmail', 'client_secret')
+    if os.path.isfile(config_file):
+        logging.debug('Using config file: %s', config_file)
+        config = ConfigParser()
+        config.read(config_file)
+        try:
+            client_id = config.get('Gmail', 'client_id')
+            client_secret = config.get('Gmail', 'client_secret')
+        except ConfigParser.NoSectionError:
+             logging.error('Check whether config file is correct.')
     token_file = os.path.join(cache_path, 'hangouts_cached_token')
     if not os.path.isfile(token_file):
         Path(token_file).touch()
