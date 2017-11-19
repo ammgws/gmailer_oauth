@@ -50,9 +50,11 @@ def create_message_with_attachment(to, subject, message_text, attachment, cc, bc
     }
     handler = handlers.get(main_type, MIMEBase)
     with open(attachment, 'rb') as f:
-        part = handler(f.read(), _subtype=sub_type)
         if handler is MIMEBase:
+            part = handler(main_type, sub_type)
             part.set_payload(f.read())
+        else:
+            part = handler(f.read(), sub_type)
 
     part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
     message.attach(part)
