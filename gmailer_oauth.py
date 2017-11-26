@@ -4,6 +4,7 @@ import logging
 import mimetypes
 import os.path
 from configparser import ConfigParser
+from email import encoders
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
@@ -31,12 +32,12 @@ def create_message_with_attachment(to, subject, message_text, attachment, cc, bc
     Maximum file size: 35MB.
     """
 
-    message = MIMEMultipart('related')
+    message = MIMEMultipart()
     message['to'] = to
     message['subject'] = subject
     message['cc'] = cc
     message['bcc'] = bcc
-    message.attach(MIMEText(message_text, _subtype='plain', _charset='UTF-8'))
+    message.attach(MIMEText(message_text))
 
     content_type, encoding = mimetypes.guess_type(attachment)
     if content_type is None or encoding is not None:
@@ -57,6 +58,7 @@ def create_message_with_attachment(to, subject, message_text, attachment, cc, bc
             part = handler(f.read(), sub_type)
 
     part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment))
+    encoders.encode_base64(part)
     message.attach(part)
 
     return message.as_bytes()
@@ -69,7 +71,6 @@ def create_message(to, subject, message_text, cc, bcc):
     message['subject'] = subject
     message['cc'] = cc
     message['bcc'] = bcc
-
 
     return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
 
@@ -138,9 +139,9 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, client_i
     """
 
     # TODO: make logging optional
-    configure_logging(config_path)
+    configure_logging(cache_path)
 
-    # TODO: config from env vars
+    # TODO: config from env vars (need to test)
     cache_dir = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME)
     if not os.path.isdir(cache_dir):
         os.makedirs(cache_dir, exist_ok=True)
@@ -208,10 +209,9 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, client_i
             logging.error('Something went wrong. Response from Google: %s.', r.content)
 
 
-def configure_logging(log_dir):
-    # Configure root logger. Level 5 = verbose to catch mostly everything.
+def configure_logging(log_dir, log_level=5):
     logger = logging.getLogger()
-    logger.setLevel(level=5)
+    logger.setLevel(level=log_level)
 
     log_folder = os.path.join(log_dir, 'logs')
     if not os.path.exists(log_folder):
@@ -219,17 +219,25 @@ def configure_logging(log_dir):
 
     log_filename = '{0}.log'.format(dt.datetime.now().strftime('%Y%m%d_%Hh%Mm%Ss'))
     log_filepath = os.path.join(log_folder, log_filename)
-    log_handler = logging.FileHandler(log_filepath)
 
+    log_handler = logging.FileHandler(log_filepath)
     log_format = logging.Formatter(
         fmt='%(asctime)s.%(msecs).03d %(name)-12s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     log_handler.setFormatter(log_format)
+
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+
     logger.addHandler(log_handler)
+    logger.addHandler(console)
+
     # Lower requests module's log level so that OAUTH2 details aren't logged
-    logging.getLogger('requests').setLevel(logging.WARNING)
+    #logging.getLogger('requests').setLevel(logging.WARNING)
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='GMAILER')
