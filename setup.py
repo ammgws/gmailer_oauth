@@ -21,7 +21,6 @@ setup(
         'click',
         'requests',
         'markovify',
-        'google_auth',
     ],
     dependency_links=['https://github.com/ammgws/google_auth/tarball/master#egg=google_auth'],
     classifiers=[
