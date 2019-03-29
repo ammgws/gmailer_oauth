@@ -22,7 +22,7 @@ setup(
         'requests',
         'google_auth',
     ],
-    dependency_links=['https://github.com/ammgws/google_auth/tarball/master#egg=google_auth'],
+    dependency_links=['git+https://github.com/ammgws/google_auth.git/#egg=google_auth-0'],
     classifiers=[
         'Topic :: Communications :: Email',
         'Development Status :: 3 - Alpha',
