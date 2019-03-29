@@ -156,7 +156,7 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, client_i
             client_secret = config.get('Gmail', 'client_secret')
         except ConfigParser.NoSectionError:
              logging.error('Check whether config file is correct.')
-    token_file = os.path.join(cache_path, 'hangouts_cached_token')
+    token_file = os.path.join(cache_path, 'cached_token')
     if not os.path.isfile(token_file):
         Path(token_file).touch()
 
