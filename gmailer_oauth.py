@@ -208,6 +208,7 @@ def main(config_path, cache_path, recipient, message, subject, dry_run, no_log, 
             logging.info('Successfully sent mail from %s.', oauth.get_email())
         else:
             logging.error('Something went wrong. Response from Google: %s.', r.content)
+            click.echo('Something went wrong. Check log file for more info', err=True)
 
 
 def configure_logging(log_dir, log_level=5):
