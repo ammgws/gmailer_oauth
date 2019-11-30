@@ -133,13 +133,14 @@ def create_dir(ctx, param, directory):
     help='Path to directory to store logs and such. Defaults to XDG cache dir.',
 )
 @click.option('--dry-run', is_flag=True)
+@click.option('--no-log', is_flag=True)
 # @click.option('--interactive', '-i', is_flag=True)
-def main(config_path, cache_path, recipient, message, subject, dry_run, client_id, client_secret, cc=None, bcc=None, attachment=None):
+def main(config_path, cache_path, recipient, message, subject, dry_run, no_log, client_id, client_secret, cc=None, bcc=None, attachment=None):
     """TODO.
     """
 
-    # TODO: make logging optional
-    configure_logging(cache_path)
+    if not no_log:
+        configure_logging(cache_path)
 
     # TODO: config from env vars (need to test)
     cache_dir = os.path.join(os.environ.get('XDG_CACHE_HOME', os.path.expanduser('~/.cache')), APP_NAME)
